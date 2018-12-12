@@ -1,0 +1,8 @@
+[packages]
+python-telegram-bot = {extras = ["socks"]}
+pysocks = "*"
+requests = "*"
+lxml = "*"
+
+[dev-packages]
+pylint = "*"
