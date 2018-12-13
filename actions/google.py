@@ -33,7 +33,7 @@ def action(bot, update):
         record = tree.xpath('//div[@class="g"]')[0]
         url = record.xpath('.//a')[0]
         description = ' '.join(record.xpath('.//span[@class="st"]/text()'))
-        count_result = tree.xpath('//div[@id="resultStats"]/text()')[0].replace('\xa0', '').split()[2]
+        count_result = ''.join(re.findall('(\d+)', tree.xpath('//div[@id="resultStats"]/text()')[0]))
         bot.send_message(
             chat_id=update.message.chat_id,
             text=f'Найдено примерно {count_result} результатов\n'

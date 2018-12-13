@@ -37,7 +37,7 @@ def action(bot, update):
 
     channel_name = update.message.chat.title
     msg = re.sub('\s+', ' ', update.message.text).strip()
-    action, quote_number = re.findall('^!(q|rq|fq|aq)(?: )?([\w\d. ]+)?', msg)[0]
+    action, quote_number = re.findall('^!(q|rq|fq|aq)(?: )?(.+)?', msg)[0]
     if quote_number.isdigit():
         quote_number = int(quote_number)
 
@@ -52,17 +52,20 @@ def action(bot, update):
     elif action == 'fq':
         finded_quotes = []
         for quote in get_quotes(channel_name):
-            if quote_number in quote:
+            if str(quote_number) in quote:
                 finded_quotes.append(quote)
         last_quoted = '\n'.join(map(format_msg, finded_quotes[-5:]))
         reply_msg = f"Мы нашли {len(finded_quotes)} результатов: {'|'.join(a.split()[0] for a in finded_quotes)}\n" \
                     f"Вот последние: \n" \
                     f"{last_quoted}"
     elif action == 'aq':
-        msg_date = update.message.date
-        author = update.message.from_user.username
-        new_count = append_quote(channel_name, msg_date, author, quote_number)
-        reply_msg = f'Цитата добавлена под номером {new_count}'
+        if len(quote_number) < 10 or len(quote_number.split()) < 3:
+            reply_msg = 'Цитата должна быть больше 10 букв или 3-х слов'
+        else:
+            msg_date = update.message.date
+            author = update.message.from_user.username
+            new_count = append_quote(channel_name, msg_date, author, quote_number)
+            reply_msg = f'Цитата добавлена под номером {new_count}'
     else:
         reply_msg = 'Упс, что-то пошло не так'
 
