@@ -19,7 +19,7 @@ def action(bot, update):
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text=f'_Не сдохли еще?_',
+        text=f'_Не сдохли еще, педики?_',
         parse_mode='markdown'
     )
     try:
@@ -31,12 +31,12 @@ def action(bot, update):
                 russia_cases['c'] = region[1]
                 russia_cases['d'] = region[2]
                 russia_cases['r'] = region[3]
-        output['global'] = f'[🤒: {global_cases["c"]} 🙂: {global_cases["r"]} 💀: {global_cases["d"]}]'
-        output['russia'] = f'[🤒: {russia_cases["c"]} 🙂: {russia_cases["r"]} 💀: {russia_cases["d"]}]'
+        output['global'] = f'🤒 {global_cases["c"]} 🙂 {global_cases["r"]} 💀 {global_cases["d"]}'
+        output['russia'] = f'🤒 {russia_cases["c"]} 🙂 {russia_cases["r"]} 💀 {russia_cases["d"]}'
     except Exception as e:
         LOG.exception(e)
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text=f'Мир: {output["global"]}\nРоссия: {output["russia"]}'
+        text=f'Мир:    {output["global"]}\nРоссия: {output["russia"]}'
     )
