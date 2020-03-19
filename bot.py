@@ -4,7 +4,7 @@ import logging
 
 from telegram.ext import Updater, MessageHandler, CommandHandler, Filters
 
-from actions import currency, log, quotes, google
+from actions import currency, log, quotes, google, virus
 
 
 logging.basicConfig(
@@ -35,6 +35,10 @@ def main():
 
     updater.dispatcher.add_handler(
         MessageHandler(filters=[Filters.regex('^!пиздец')], callback=currency.action)
+    )
+
+    updater.dispatcher.add_handler(
+        MessageHandler(filters=[Filters.regex('^!корона')], callback=virus.action)
     )
 
     updater.dispatcher.add_handler(
