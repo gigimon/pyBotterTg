@@ -38,5 +38,5 @@ def action(bot, update):
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text=f'Мир: {output["global"]} Россия: {output["global"]}'
+        text=f'Мир: {output["global"]}\nРоссия: {output["russia"]}'
     )
