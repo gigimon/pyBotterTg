@@ -29,17 +29,25 @@ def action(bot, update):
     )
     try:
         data = requests.get(api_url, headers=headers).json()
-        total_cases = data['timeline']['global'][-1]
-        total_cases_previous = data['timeline']['global'][-2]
+        total_cases = {'c':0, 'd':0, 'r': 0}
+        total_cases_previous = {'c':0, 'd':0, 'r': 0}
         russia_cases = {}
         russia_cases_previous = {}
         for region in data['regions']:
+            total_cases['c'] += int(region[1])
+            total_cases['d'] += int(region[2])
+            total_cases['r'] += int(region[3])
+            try:
+                total_cases_previous['c'] += region[4][-2]['c']
+                total_cases_previous['d'] += region[4][-2]['d']
+                total_cases_previous['r'] += region[4][-2]['r']
+            except IndexError:
+                pass
             if region[0]['en_name']=='Russia':
                 russia_cases['c'] = region[1]
                 russia_cases['d'] = region[2]
                 russia_cases['r'] = region[3]
                 russia_cases_previous = region[4][-2]
-                break
         output['total'] = f'🤒\t{total_cases["c"]} ({diff(total_cases["c"], total_cases_previous["c"])})\n🙂\t{total_cases["r"]} ({diff(total_cases["r"], total_cases_previous["r"])})\n💀\t{total_cases["d"]} ({diff(total_cases["d"], total_cases_previous["d"])})'
         output['russia'] = f'🤒\t{russia_cases["c"]} ({diff(russia_cases["c"], russia_cases_previous["c"])})\n🙂\t{russia_cases["r"]} ({diff(russia_cases["r"], russia_cases_previous["r"])})\n💀\t{russia_cases["d"]} ({diff(russia_cases["d"], russia_cases_previous["d"])})'
     except Exception as e:
