@@ -12,7 +12,7 @@ def action(bot, update):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.1453.93 '
                       'Safari/537.36'
     }
-    api_url = "https://covid19info.live/processeddata.js"
+    api_url = "https://data.covid19info.live/processeddata.js"
 
     output = {}
 
