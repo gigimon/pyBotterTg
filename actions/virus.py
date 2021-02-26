@@ -21,7 +21,7 @@ def action(bot, update):
         data = requests.get(api_url).json()
         total_cases = {'c':data["total"]["confirmed"]["total"], 'd':data["total"]["dead"]["total"], 'r': data["total"]["recovered"]["total"]}
         total_cases_previous = {'c': data["total"]["confirmed"]["diff"], 'd':data["total"]["dead"]["diff"], 'r': data["total"]["recovered"]["diff"]}
-        russia_cases = {'c':data["total"]["confirmed"]["total"], 'd':data["total"]["dead"]["total"], 'r': data["total"]["recovered"]["total"]}
+        russia_cases = {'c':data["Russia"]["confirmed"]["total"], 'd':data["Russia"]["dead"]["total"], 'r': data["Russia"]["recovered"]["total"]}
         russia_cases_previous = {'c': data["Russia"]["confirmed"]["diff"], 'd':data["Russia"]["dead"]["diff"], 'r': data["Russia"]["recovered"]["diff"]}
 
         output['total'] = f'🤒\t{total_cases["c"]} (+{total_cases_previous["c"]})\n🙂\t{total_cases["r"]} (+{total_cases_previous["r"]})\n💀\t{total_cases["d"]} (+{total_cases_previous["d"]})'
