@@ -18,7 +18,7 @@ def action(bot, update):
         'ETH': 'https://www.investing.com/crypto/ethereum',
         'USD': 'https://www.investing.com/currencies/usd-rub',
         'EUR': 'https://www.investing.com/currencies/eur-rub',
-        'OIL': 'http://www.investing.com/commodities/brent-oil'
+        'OIL': 'https://www.investing.com/commodities/brent-oil'
     }
 
     output = {}
