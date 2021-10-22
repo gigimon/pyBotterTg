@@ -32,8 +32,12 @@ def action(bot, update):
     for name in currencies:
         try:
             tree = html.fromstring(requests.get(currencies[name], headers=headers).content)
-            value = float(tree.xpath("//*[@id='last_last']")[0].text.strip().replace(',', ''))
-            output[name] = value
+            elem_last_last = tree.xpath("//*[@id='last_last']")
+            elem_data_test = tree.xpath("//*[@data-test='instrument-price-last']")
+            if len(elem_last_last)>0:
+                output[name]=float(elem_last_last[0].text.strip().replace(',', ''))
+            elif len(elem_data_test)>0:
+                output[name] = float(elem_data_test[0].text.strip().replace(',', ''))
         except Exception as e:
             LOG.exception(e)
 
