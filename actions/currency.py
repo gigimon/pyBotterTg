@@ -18,7 +18,8 @@ def action(bot, update):
         'ETH': 'https://www.investing.com/crypto/ethereum',
         'USD': 'https://www.investing.com/currencies/usd-rub',
         'EUR': 'https://www.investing.com/currencies/eur-rub',
-        'OIL': 'https://www.investing.com/commodities/brent-oil'
+        'OIL': 'https://www.investing.com/commodities/brent-oil',
+        'GAS': 'https://www.investing.com/commodities/ice-dutch-ttf-gas-c1-futures'
     }
 
     output = {}
@@ -43,5 +44,5 @@ def action(bot, update):
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text=f'₿ {output["XBT"]}$  ♦ {output["ETH"]}$  💵 {output["USD"]}₽  💶 {output["EUR"]}₽  🛢️ {output["OIL"]}$'
+        text=f'₿ {output["XBT"]}$  ♦ {output["ETH"]}$  💵 {output["USD"]}₽  💶 {output["EUR"]}₽  🛢️ {output["OIL"]}$  🔥 {int(output["GAS"]) * 10}€'
     )
