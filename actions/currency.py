@@ -44,5 +44,5 @@ def action(bot, update):
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text=f'₿ {output["XBT"]}$  ♦ {output["ETH"]}$  💵 {output["USD"]}₽  💶 {output["EUR"]}₽  🛢️ {output["OIL"]}$  ⛽️ {float(output["GAS"]) * 10}€'
+        text=f'₿ ${output["XBT"]}  ♦ ${output["ETH"]}  💵 {output["USD"]}₽  💶 {output["EUR"]}₽  🛢️ ${output["OIL"]}  ⛽️ €{float(output["GAS"]) * 10}'
     )
