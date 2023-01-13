@@ -14,12 +14,12 @@ def action(bot, update):
                       'Safari/537.36'
     }
     currencies = {
-        'XBT': 'https://www.investing.com/crypto/bitcoin',
-        'ETH': 'https://www.investing.com/crypto/ethereum',
-        'USD': 'https://www.investing.com/currencies/usd-rub',
-        'EUR': 'https://www.investing.com/currencies/eur-rub',
-        'OIL': 'https://www.investing.com/commodities/brent-oil',
-        'GAS': 'https://www.investing.com/commodities/ice-dutch-ttf-gas-c1-futures'
+        'XBT': 'https://finance.yahoo.com/quote/BTC-USD?p=BTC-USD&.tsrc=fin-srch',
+        'ETH': 'https://finance.yahoo.com/quote/ETH-USD?p=ETH-USD&.tsrc=fin-srch',
+        'USD': 'https://finance.yahoo.com/quote/RUB=X?p=RUB=X&.tsrc=fin-srch',
+        'EUR': 'https://finance.yahoo.com/quote/EURRUB=X?p=EURRUB=X&.tsrc=fin-srch',
+        'OIL': 'https://finance.yahoo.com/quote/BZH23.NYM?p=BZH23.NYM&.tsrc=fin-srch',
+        'GAS': 'https://finance.yahoo.com/quote/TTF=F?p=TTF=F&.tsrc=fin-srch'
     }
 
     output = {}
@@ -33,15 +33,11 @@ def action(bot, update):
     for name in currencies:
         try:
             tree = html.fromstring(requests.get(currencies[name], headers=headers).content)
-            elem_last_last = tree.xpath("//*[@id='last_last']")
-            elem_data_test = tree.xpath("//*[@data-test='instrument-price-last']")
-            if len(elem_last_last)>0:
-                output[name]=float(elem_last_last[0].text.strip().replace(',', ''))
-            elif len(elem_data_test)>0:
-                output[name] = float(elem_data_test[0].text.strip().replace(',', ''))
+            value = tree.xpath('//*[@data-test="qsp-price"]')[0].attrib["value"]
+            output[name] = float(value)
         except Exception as e:
             LOG.exception(e)
-
+    
     bot.send_message(
         chat_id=update.message.chat_id,
         text=f'₿ ${output["XBT"]}  ♦ ${output["ETH"]}  💵 {output["USD"]}₽  💶 {output["EUR"]}₽  🛢️ ${output["OIL"]}  ⛽️ €{round(float(output["GAS"]) * 10, 2)}'
