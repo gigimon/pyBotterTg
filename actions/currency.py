@@ -18,7 +18,7 @@ def action(bot, update):
         'ETH': 'https://finance.yahoo.com/quote/ETH-USD?p=ETH-USD&.tsrc=fin-srch',
         'USD': 'https://finance.yahoo.com/quote/RUB=X?p=RUB=X&.tsrc=fin-srch',
         'EUR': 'https://finance.yahoo.com/quote/EURRUB=X?p=EURRUB=X&.tsrc=fin-srch',
-        'OIL': 'https://finance.yahoo.com/quote/BZK23.NYM?p=BZK23.NYM',
+        'OIL': 'https://finance.yahoo.com/quote/BZM23.NYM?p=BZM23.NYM',
         'GAS': 'https://finance.yahoo.com/quote/TTF=F?p=TTF=F&.tsrc=fin-srch'
     }
 
