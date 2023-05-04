@@ -1,15 +1,16 @@
 import logging
+import aiohttp
 
-import requests
 from lxml import html
 
 LOG = logging.getLogger(__name__)
 
 
-def action(bot, update):
+async def action(update, context) -> None:
+    """Weather receiver"""
     city = update.message.text.split()[1].strip()
 
-    get_search_results = requests.get(
+    get_search_results = await aiohttp.get(
         'https://www.gismeteo.ru/api/v2/search/searchresultforsuggest/%s/?lang=ru&domain=ru' % city,
         headers={
             'Host': 'www.gismeteo.ru',
@@ -18,8 +19,8 @@ def action(bot, update):
         }
     )
 
-    weather_url = get_search_results.json()['items'][0]['url']
-    weather = html.fromstring(requests.get(
+    weather_url = await get_search_results.json()['items'][0]['url']
+    weather = html.fromstring(await aiohttp.get(
         'https://www.gismeteo.ru%s' % weather_url,
         headers={
             'Host': 'www.gismeteo.ru',
@@ -52,8 +53,8 @@ def action(bot, update):
         data += rainfall[i:i + 2]
         data += winds[i:i + 2]
 
-    print('data %s ' % len(data))
-    print(data)
+    # print('data %s ' % len(data))
+    # print(data)
 
     message = """
     Погода в городе {} на {} ({})
@@ -63,7 +64,7 @@ def action(bot, update):
     Вечер ({} - {}) - температура {}-{} {} -> {} (осадки {} - {} мм) ветер {} - {} м/с
     """.format(city, dates[1].text.strip(), dates[0].text.strip(), *data)
 
-    bot.send_message(
-        chat_id=update.message.chat_id,
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
         text=message
     )

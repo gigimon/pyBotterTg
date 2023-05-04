@@ -1,11 +1,12 @@
 import re
 import random
 import logging
-
+from pathlib import Path
 LOG = logging.getLogger(__name__)
 
 
-def action(bot, update):
+async def action(update, context) -> None:
+    """A Quotes engine"""
     def get_quotes(channel):
         with open(f'quotes/{channel}.txt', 'r') as quotes_file:
             quotes = quotes_file.readlines()
@@ -35,7 +36,13 @@ def action(bot, update):
             reply_msg = f'Эта цитата была удалена вот этим пидором {quote.split(" ", 2)[1]}'
         return reply_msg
 
-    channel_name = update.message.chat.title
+    channel_name = update.effective_chat.title or str(update.effective_chat.id)
+    quotes_file_path = Path(f'quotes/{channel_name}.txt')
+    if not quotes_file_path.is_file():
+        # Create a new file if not exists
+        with open(quotes_file_path, "a+") as f:
+            pass
+    
     msg = re.sub('\s+', ' ', update.message.text).strip()
     action, quote_number = re.findall('^!(q|rq|fq|aq)(?: )?(.+)?', msg)[0]
     if quote_number.isdigit():
@@ -50,14 +57,17 @@ def action(bot, update):
         quote_number = None
         reply_msg = format_msg(get_quote(channel_name, quote_number))
     elif action == 'fq':
-        finded_quotes = []
+        found_quotes = []
         for quote in get_quotes(channel_name):
             if str(quote_number) in quote:
-                finded_quotes.append(quote)
-        last_quoted = '\n'.join(map(format_msg, finded_quotes[-5:]))
-        reply_msg = f"Мы нашли {len(finded_quotes)} результатов: {'|'.join(a.split()[0] for a in finded_quotes)}\n" \
-                    f"Вот последние: \n" \
-                    f"{last_quoted}"
+                found_quotes.append(quote)
+        last_quoted = '\n'.join(map(format_msg, found_quotes[-5:]))
+        found_quotes_len = len(found_quotes)
+        if not found_quotes_len:
+            reply_msg = f"Нет таких цитат"
+        else:
+            reply_msg = f"Мы нашли {found_quotes_len} результатов: {'|'.join(a.split()[0] for a in found_quotes)}\n"\
+                f"Вот последние: \n{last_quoted}"
     elif action == 'aq':
         if len(quote_number) < 10 or len(quote_number.split()) < 3:
             reply_msg = 'Цитата должна быть больше 10 букв или 3-х слов'
@@ -69,7 +79,7 @@ def action(bot, update):
     else:
         reply_msg = 'Упс, что-то пошло не так'
 
-    bot.send_message(
-        chat_id=update.message.chat_id,
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
         text=reply_msg
     )

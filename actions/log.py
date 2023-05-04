@@ -6,13 +6,14 @@ LOG = logging.getLogger(__name__)
 LOG_PATH = pathlib.Path('./logs').expanduser()
 
 
-def action(bot, update):
-    LOG.debug('Save message to log')
+async def action(update, context) -> None:
+    """Saving message to log"""
+    LOG.debug('Saving message to log')
 
-    if update.message.chat_id is None:
+    if update.effective_chat.id is None:
         return
 
-    chat_name = update.message.chat.title
+    chat_name = update.effective_chat.title or str(update.effective_chat.id)
     username = update.message.from_user.first_name
     date = update.message.date
 
