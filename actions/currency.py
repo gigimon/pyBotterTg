@@ -1,12 +1,26 @@
-import logging
 
-import requests
+import aiohttp
+import logging
+import asyncio
+
 from lxml import html
 
 LOG = logging.getLogger(__name__)
 
 
-def action(bot, update):
+async def fetch_data(currencies: dict[str, str], headers: dict) -> dict[str, str]:
+    """Fetchnig data from sources"""
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for symbol in currencies:
+            tasks.append(asyncio.create_task(session.get(currencies[symbol]["url"], headers=headers)))
+        completed_responses = await asyncio.gather(*tasks)
+        results = [await r.text() for r in completed_responses]
+    return dict(zip(currencies.keys(), results))
+
+
+async def action(update, context) -> None:
+    """Handle currency price request"""
     LOG.debug('Handle currency price request')
 
     headers = {
@@ -14,31 +28,61 @@ def action(bot, update):
                       'Safari/537.36'
     }
     currencies = {
-        'XBT': 'https://finance.yahoo.com/quote/BTC-USD?p=BTC-USD&.tsrc=fin-srch',
-        'ETH': 'https://finance.yahoo.com/quote/ETH-USD?p=ETH-USD&.tsrc=fin-srch',
-        'USD': 'https://finance.yahoo.com/quote/RUB=X?p=RUB=X&.tsrc=fin-srch',
-        'EUR': 'https://finance.yahoo.com/quote/EURRUB=X?p=EURRUB=X&.tsrc=fin-srch',
-        'OIL': 'https://finance.yahoo.com/quote/BZM23.NYM?p=BZM23.NYM',
-        'GAS': 'https://finance.yahoo.com/quote/TTF=F?p=TTF=F&.tsrc=fin-srch'
+        'XBT': {
+            'url': 'https://finance.yahoo.com/quote/BTC-USD?p=BTC-USD&.tsrc=fin-srch',
+            'format': '₿ ${}',
+        },
+        'ETH': {
+            'url': 'https://finance.yahoo.com/quote/ETH-USD?p=ETH-USD&.tsrc=fin-srch',
+            'format': '♦ ${}',
+        },
+        'USD': {
+            'url': 'https://finance.yahoo.com/quote/RUB=X?p=RUB=X&.tsrc=fin-srch',
+            'format': '💵 {}₽',
+        },
+        'EUR': {
+            'url': 'https://finance.yahoo.com/quote/EURRUB=X?p=EURRUB=X&.tsrc=fin-srch',
+            'format': '💶 {}₽',
+        },
+        'OIL': {
+            'url': 'https://finance.yahoo.com/quote/BZM23.NYM?p=BZM23.NYM',
+            'format': '🛢️ ${}',
+        },
+        'GAS': {
+            'url': 'https://finance.yahoo.com/quote/TTF=F?p=TTF=F&.tsrc=fin-srch',
+            'format': '⛽️ €{}',
+            'preparing_fn': lambda x: round(float(x) * 10, 2),
+        },
     }
 
     output = {}
 
-    bot.send_message(
-        chat_id=update.message.chat_id,
+    response = await context.bot.send_message(
+        chat_id=update.effective_chat.id,
         text=f'_Отправляю запрос к трейдерам..._',
         parse_mode='markdown'
     )
+    # Get initial message ID for the further editing
+    pre_message_id = response.message_id
 
-    for name in currencies:
+    results = await fetch_data(currencies=currencies, headers=headers)
+
+    for symbol, data in results.items():
         try:
-            tree = html.fromstring(requests.get(currencies[name], headers=headers).content)
+            tree = html.fromstring(data)
             value = tree.xpath('//*[@data-test="qsp-price"]')[0].attrib["value"]
-            output[name] = float(value)
+            if "preparing_fn" in currencies[symbol]:
+                value = currencies[symbol]["preparing_fn"](value)
+            output[symbol] = currencies[symbol]["format"].format(value)
         except Exception as e:
             LOG.exception(e)
+            output[symbol] = currencies[symbol]["format"].format('n/a')
     
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text=f'₿ ${output["XBT"]}  ♦ ${output["ETH"]}  💵 {output["USD"]}₽  💶 {output["EUR"]}₽  🛢️ ${output["OIL"]}  ⛽️ €{round(float(output["GAS"]) * 10, 2)}'
+    text = "  ".join([data for symbol, data in output.items()])
+
+    # Update the initial message with fetched data
+    await context.bot.edit_message_text(
+        message_id=pre_message_id,
+        chat_id=update.effective_chat.id,
+        text=text
     )

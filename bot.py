@@ -2,9 +2,9 @@ import os
 import sys
 import logging
 
-from telegram.ext import Updater, MessageHandler, CommandHandler, Filters
+from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters
 
-from actions import currency, log, quotes, google, virus
+from actions import currency, log, quotes, google
 
 
 logging.basicConfig(
@@ -23,37 +23,33 @@ if BOT_API_KEY is None:
 LOG = logging.getLogger(__name__)
 
 
-def main():
-    updater = Updater(token=BOT_API_KEY)
-    updater.dispatcher.add_handler(
+def main() -> None:
+    application = ApplicationBuilder().token(BOT_API_KEY).build()
+
+    application.add_handler(
         CommandHandler(command='pizdec', callback=currency.action)
     )
 
-    updater.dispatcher.add_handler(
-        MessageHandler(filters=[Filters.regex('^!(g|гугл)')], callback=google.action)
+    application.add_handler(
+        MessageHandler(filters=filters.Regex('^!пиздец'), callback=currency.action)
     )
 
-    updater.dispatcher.add_handler(
-        MessageHandler(filters=[Filters.regex('^!пиздец')], callback=currency.action)
+    application.add_handler(
+        MessageHandler(filters=filters.Regex('^!(q|rq|fq|aq)'), callback=quotes.action)
     )
+    # application.add_handler(
+    #     MessageHandler(filters=filters.regex('^!(g|гугл)'), callback=google.action)
+    # )
 
-    updater.dispatcher.add_handler(
-        MessageHandler(filters=[Filters.regex('^!корона')], callback=virus.action)
-    )
-
-    updater.dispatcher.add_handler(
-        MessageHandler(filters=[Filters.regex('^!(q|rq|fq|aq)')], callback=quotes.action)
-    )
-
-    # updater.dispatcher.add_handler(
+    # application.add_handler(
     #     CommandHandler(command='weather', callback=weather)
     # )
 
-    updater.dispatcher.add_handler(
+    application.add_handler(
         MessageHandler(filters=None, callback=log.action)
     )
 
-    updater.start_polling()
+    application.run_polling()
 
 
 if __name__ == '__main__':
