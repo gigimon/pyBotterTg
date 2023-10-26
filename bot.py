@@ -4,7 +4,7 @@ import logging
 
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters
 
-from actions import currency, log, quotes, google
+from actions import currency, log, quotes, instagram, xcom
 
 
 logging.basicConfig(
@@ -44,6 +44,22 @@ def main() -> None:
     # application.add_handler(
     #     CommandHandler(command='weather', callback=weather)
     # )
+
+    application.add_handler(
+        MessageHandler(
+            filters.Regex(r"^(https\:\/\/twitter\.com\/|https\:\/\/x\.com\/)"),
+            callback=xcom.action,
+        )
+    )
+
+    application.add_handler(
+        MessageHandler(
+            filters.Regex(
+                r"^(https\:\/\/instagram\.com\/|https\:\/\/www\.instagram\.com\/)"
+            ),
+            callback=instagram.action,
+        )
+    )
 
     application.add_handler(
         MessageHandler(filters=None, callback=log.action)
