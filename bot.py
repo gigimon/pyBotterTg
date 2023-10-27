@@ -52,14 +52,14 @@ def main() -> None:
         )
     )
 
-    application.add_handler(
-        MessageHandler(
-            filters.Regex(
-                r"^(https\:\/\/instagram\.com\/|https\:\/\/www\.instagram\.com\/)"
-            ),
-            callback=instagram.action,
-        )
-    )
+    # application.add_handler(
+    #     MessageHandler(
+    #         filters.Regex(
+    #             r"^(https\:\/\/instagram\.com\/|https\:\/\/www\.instagram\.com\/)"
+    #         ),
+    #         callback=instagram.action,
+    #     )
+    # )
 
     application.add_handler(
         MessageHandler(filters=None, callback=log.action)
