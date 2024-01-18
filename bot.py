@@ -1,11 +1,10 @@
+import logging
 import os
 import sys
-import logging
 
-from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 
-from actions import currency, log, quotes, instagram, xcom
-
+from actions import currency, instagram, log, quotes, xcom
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -13,10 +12,12 @@ logging.basicConfig(
 )
 
 BOT_NAME = 'pyBotterBot'
-BOT_API_KEY = os.environ.get('TG_API_KEY', None)
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', "")
+ALLOWED_CHATS = os.environ.get("ALLOWED_CHATS", "")
 
-if BOT_API_KEY is None:
-    print('API key not found. Use TG_API_KEY environment variable')
+
+if not TELEGRAM_BOT_TOKEN:
+    print('API key not found. Use TELEGRAM_BOT_TOKEN environment variable')
     sys.exit(1)
 
 
@@ -24,7 +25,20 @@ LOG = logging.getLogger(__name__)
 
 
 def main() -> None:
-    application = ApplicationBuilder().token(BOT_API_KEY).build()
+
+    allowed_chats_list = None
+
+    if len(ALLOWED_CHATS):
+        allowed_chats_list = [int(x) for x in ALLOWED_CHATS.split(",")]
+
+    print("Use filters.Chat(allowed_chats_list) with handlers to control chats access")
+
+    if allowed_chats_list:
+        print(f"Allowed chats are: {allowed_chats_list}")
+    else:
+        print("This bot is public and could be used in any chat")
+
+    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
     application.add_handler(
         CommandHandler(command='pizdec', callback=currency.action)
@@ -52,17 +66,17 @@ def main() -> None:
         )
     )
 
-    # application.add_handler(
-    #     MessageHandler(
-    #         filters.Regex(
-    #             r"^(https\:\/\/instagram\.com\/|https\:\/\/www\.instagram\.com\/)"
-    #         ),
-    #         callback=instagram.action,
-    #     )
-    # )
+    application.add_handler(
+        MessageHandler(
+            filters.Regex(
+                r"^(https\:\/\/instagram\.com\/|https\:\/\/www\.instagram\.com\/)"
+            ),
+            callback=instagram.action,
+        )
+    )
 
     application.add_handler(
-        MessageHandler(filters=None, callback=log.action)
+        MessageHandler(filters=filters.BaseFilter(), callback=log.action)
     )
 
     application.run_polling()

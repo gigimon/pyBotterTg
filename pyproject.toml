@@ -1,0 +1,133 @@
+# [build-system]
+# requires = ["setuptools>=61", "setuptools-scm[toml]>=6.2"]
+# build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyBotterTg"
+dynamic = ["version"]
+description = "A Telegram bot"
+readme = "README.rst"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 1 - Beta",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Typing :: Typed",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+]
+keywords = [
+    "bot",
+]
+authors = [
+    {name = "D K", email = "pybottertg@jklwertui.com"},
+    {name = "gigimon", email = "pybottertg@jklwertui.com"},
+]
+maintainers = [
+    {name = "D K", email = "pybottertg@jklwertui.com"},
+    {name = "gigimon", email = "pybottertg@jklwertui.com"},
+]
+dependencies = [
+    "aiofiles",
+    "aiohttp",
+    "pysocks",
+    "python-telegram-bot",
+    "lxml==5.1.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=3.0.0",
+    "tox>=4",
+    "mypy",
+    "ruff",
+    "lxml_stubs==0.5.1"
+]
+test = [
+    "pytest>=7",
+]
+docs = [
+]
+
+# [project.urls]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+include-package-data = true
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies = {dev = { file = ["requirements-dev.txt"] }}
+
+# [tool.setuptools_scm]
+
+
+[tool.ruff]
+select = ["E", "W", "F", "I", "B", "N", "UP", "YTT", "ANN",
+    "ASYNC", "S", "A", "C4", "DTZ", "DJ", "EM", "ISC", "ICN", "G", "INP",
+    "PIE",
+]
+ignore = [
+    "E501",  # Line too long ({width} > {limit} characters)
+    # "ANN001",  #  Missing type annotation for function argument {name}
+    "ANN002",  #  Missing type annotation for *{name} (missing-type-args)
+    "ANN003",  #  Missing type annotation for **{name} (missing-type-kwargs)
+    "ANN101",  #  Missing type annotation for {name} in method (missing-type-self)
+    "S113",  #  Probable use of requests call without timeout
+]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM", "ERA", "EXE", "FBT", "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE",
+"PL", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "TRY", "UP", "YTT"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".env",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Same as Black.
+line-length = 88
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.10
+target-version = "py310"
+
+# Unlike Flake8, default to a complexity level of 10.
+# max-complexity = 10
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = "telegram.ext"
+#ignore_missing_imports = true
